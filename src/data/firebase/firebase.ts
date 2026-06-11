@@ -5,13 +5,13 @@ import { getStorage } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const firebaseConfig = {
-  apiKey: 'AIzaSyBQYfiEFKkd-9PtwGBiN9WKZri_hYsCYrA',
-  authDomain: 'dental-apps-77834.firebaseapp.com',
-  projectId: 'dental-apps-77834',
-  storageBucket: 'dental-apps-77834.firebasestorage.app',
-  messagingSenderId: '1023648881577',
-  appId: '1:1023648881577:web:cf357e7d25ff46b55242b8',
-  measurementId: 'G-E2N5BL05JL',
+  apiKey: 'YOUR_FIREBASE_API_KEY',
+  authDomain: 'your-project-id.firebaseapp.com',
+  projectId: 'your-project-id',
+  storageBucket: 'your-project-id.firebasestorage.app',
+  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+  appId: 'YOUR_FIREBASE_APP_ID',
+  measurementId: 'YOUR_MEASUREMENT_ID',
 };
 
 export const firebaseApp = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);

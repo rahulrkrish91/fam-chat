@@ -31,7 +31,7 @@ docs/firebase-schema.md    Schema, indexes, queries, and cost notes
 
 ## Firebase setup
 
-The app is preconfigured for project `dental-apps-77834` in `app.json` and `src/data/firebase/firebase.ts`. Add native Firebase config files before device builds:
+The app is preconfigured for project `your-project-id` in `app.json` and `src/data/firebase/firebase.ts`. Add native Firebase config files before device builds:
 
 - Android: `google-services.json`
 - iOS: `GoogleService-Info.plist`
