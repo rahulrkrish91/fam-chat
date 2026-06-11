@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isSelf(userId) { return signedIn() && request.auth.uid == userId; }
+    function familyMember(familyId) {
+      return signedIn() && exists(/databases/$(database)/documents/families/$(familyId)/familyMembers/$(request.auth.uid));
+    }
+    function familyAdmin(familyId) {
+      return familyMember(familyId) && get(/databases/$(database)/documents/families/$(familyId)/familyMembers/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read, update: if isSelf(userId);
+      allow create: if isSelf(userId);
+      match /families/{familyId} { allow read, write: if isSelf(userId) || familyAdmin(familyId); }
+      match /devices/{token} { allow read, write: if isSelf(userId); }
+    }
+
+    match /families/{familyId} {
+      allow read: if familyMember(familyId);
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if familyAdmin(familyId);
+      match /familyMembers/{userId} {
+        allow read: if familyMember(familyId);
+        allow create: if signedIn() && (request.auth.uid == userId || familyAdmin(familyId));
+        allow update, delete: if familyAdmin(familyId);
+      }
+    }
+
+    match /chats/{chatId} {
+      allow read: if familyMember(resource.data.familyId);
+      allow create: if familyMember(request.resource.data.familyId);
+      allow update: if familyMember(resource.data.familyId);
+      match /messages/{messageId} {
+        allow read: if familyMember(resource.data.familyId);
+        allow create: if familyMember(request.resource.data.familyId) && request.resource.data.senderId == request.auth.uid;
+        allow update: if familyMember(resource.data.familyId);
+        allow delete: if false;
+      }
+    }
+
+    match /events/{eventId} {
+      allow read: if familyMember(resource.data.familyId);
+      allow create: if familyMember(request.resource.data.familyId) && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if familyAdmin(resource.data.familyId) || resource.data.createdBy == request.auth.uid;
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if familyMember(resource.data.familyId);
+      allow create: if familyMember(request.resource.data.familyId);
+      allow update, delete: if familyAdmin(resource.data.familyId) || resource.data.paidBy == request.auth.uid;
+    }
+
+    match /locations/{locationId} {
+      allow read: if familyMember(resource.data.familyId);
+      allow create, update: if familyMember(request.resource.data.familyId) && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /notifications/{notificationId} {
+      allow read, update: if signedIn() && request.auth.uid in resource.data.recipientIds;
+      allow create: if signedIn();
+      allow delete: if false;
+    }
+  }
+}
