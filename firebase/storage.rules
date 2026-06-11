@@ -1,0 +1,14 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function familyMember(familyId) {
+      return signedIn() && firestore.exists(/databases/(default)/documents/families/$(familyId)/familyMembers/$(request.auth.uid));
+    }
+
+    match /families/{familyId}/{folder}/{userId}/{fileName=**} {
+      allow read: if familyMember(familyId);
+      allow write: if familyMember(familyId) && request.auth.uid == userId && request.resource.size < 25 * 1024 * 1024;
+    }
+  }
+}
