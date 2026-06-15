@@ -50,6 +50,9 @@ npm run typecheck
 npm start
 ```
 
+> `npm run typecheck` is defined at the repository root and delegates to `scripts/typecheck.mjs`, which verifies local dependencies are installed before running `tsc --noEmit`. Run it from this directory after `npm install`.
+
+
 ## Cost controls
 
 See [`docs/firebase-schema.md`](docs/firebase-schema.md) for collection design, composite indexes, query examples, and explanations of Firestore/Storage cost optimizations.
